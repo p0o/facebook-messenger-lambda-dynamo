@@ -1,5 +1,5 @@
 
-
+const { sendStandardMessage } = require("./service");
 const { MESSENGER_VERIFY_TOKEN } = process.env;
 /**
  * Receive webhook from Facebook Messenger
@@ -26,6 +26,14 @@ exports.receiveWebhookHandler = async (event, context) => {
       // will only ever contain one message, so we get index 0
       const webhookEvent = entry.messaging[0];
       console.log("[Lambda] Message received", webhookEvent);
+
+      if (webhookEvent.sender) {
+        // Reply back to the sender to confirm if the message is received
+        sendStandardMessage(
+          "Thank you! I just received your inspiring message ✌🏼",
+          webhookEvent.sender
+        );
+      }
     });
 
     response = {
