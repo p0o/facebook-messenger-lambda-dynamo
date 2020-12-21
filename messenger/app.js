@@ -1,4 +1,6 @@
 
+
+const { MESSENGER_VERIFY_TOKEN } = process.env;
 /**
  * Receive webhook from Facebook Messenger
  * 
@@ -42,19 +44,38 @@ exports.receiveWebhookHandler = async (event, context) => {
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.webhookVerificationHandler = async (event, context) => {
+exports.webhookVerificationHandler = (event, context) => {
   let response;
-  try {
+  const { queryStringParameters: params } = event;
+
+  if (!params) {
     response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-      }),
+      statusCode: 400,
     };
-  } catch (err) {
-    console.log(err);
-    return err;
+    return response;
+  }
+
+  // Parse the query params
+  const mode = params["hub.mode"];
+  const token = params["hub.verify_token"];
+  const challenge = params["hub.challenge"];
+
+  // Checks if a token and mode is in the query string of the request
+  if (mode && token) {
+    // Checks the mode and token sent is correct
+    if (mode === "subscribe" && token === MESSENGER_VERIFY_TOKEN) {
+      // Responds with the challenge token from the request
+      response = {
+        statusCode: 200,
+        body: challenge,
+      };
+    } else {
+      // Responds with '403 Forbidden' if verify tokens do not match
+      response = {
+        statusCode: 403,
+      };
+    }
   }
 
   return response;
-}
+};
