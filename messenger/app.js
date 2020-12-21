@@ -16,16 +16,26 @@ const { MESSENGER_VERIFY_TOKEN } = process.env;
  */
 exports.receiveWebhookHandler = async (event, context) => {
   let response;
-  try {
+  const { body } = event;
+
+  // Checks this is an event from a page subscription
+  if (body.object === "page") {
+    // Iterates over each entry - there may be multiple if batched
+    body.entry.forEach(function (entry) {
+      // Gets the message. entry.messaging is an array, but
+      // will only ever contain one message, so we get index 0
+      const webhookEvent = entry.messaging[0];
+      console.log("[Lambda] Message received", webhookEvent);
+    });
+
     response = {
-      'statusCode': 200,
-      'body': JSON.stringify({
-          success: true,
-      })
-    }
-  } catch (err) {
-    console.log(err);
-    return err;
+      statusCode: 200,
+      body: "EVENT_RECEIVED",
+    };
+  } else {
+    response = {
+      statusCode: 404,
+    };
   }
 
   return response
