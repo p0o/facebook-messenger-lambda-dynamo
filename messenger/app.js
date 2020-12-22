@@ -14,12 +14,12 @@ const { MESSENGER_VERIFY_TOKEN } = process.env;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.receiveWebhookHandler = async (event, context) => {
+exports.receiveWebhookHandler = async (event, context, cb) => {
   let response;
   const { body } = event;
 
   // Checks this is an event from a page subscription
-  if (body.object === "page") {
+  if (body && body.object === "page") {
     // Iterates over each entry - there may be multiple if batched
     body.entry.forEach(function (entry) {
       // Gets the message. entry.messaging is an array, but
@@ -62,11 +62,11 @@ exports.receiveWebhookHandler = async (event, context) => {
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.webhookVerificationHandler = (event, context) => {
+exports.webhookVerificationHandler = async (event, context, cb) => {
   let response;
   const { queryStringParameters: params } = event;
 
-  if (!params) {
+  if (!params || !params['hub.mode']) {
     response = {
       statusCode: 400,
     };
