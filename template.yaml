@@ -9,6 +9,10 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+    Envrionment:
+      Variables:
+        MESSENGER_VERIFY_TOKEN: !Ref MESSENGER_VERIFY_TOKEN
+        ACCESS_TOKEN: !Ref ACCESS_TOKEN
 
 Resources:
   WebhookVerificationFunction:
