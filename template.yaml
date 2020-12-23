@@ -10,7 +10,6 @@ Globals:
   Function:
     Timeout: 3
     CodeUri: messenger/
-    Handler: app.receiveWebhookHandler
     Runtime: nodejs12.x
     Environment:
       Variables:
@@ -27,6 +26,7 @@ Resources:
   WebhookVerificationFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Handler: app.webhookVerificationHandler
       Events:
         VerifyWebhook:
           Type: Api
@@ -36,6 +36,7 @@ Resources:
   ReceiveWebhookFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Handler: app.receiveWebhookHandler
       Events:
         ReceiveWebhook:
           Type: Api
