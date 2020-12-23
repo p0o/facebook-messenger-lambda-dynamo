@@ -1,7 +1,8 @@
 "use strict";
-
-const app = require("../../app.js");
+const sinon = require("sinon");
 const chai = require("chai");
+const app = require("../../app.js");
+const service = require("../../service");
 const expect = chai.expect;
 let event, context;
 
@@ -24,6 +25,18 @@ const mockMessagePayload = {
 };
 
 describe("Tests for receiveWebhookHandler", function () {
+  let sendStandardMessageStub;
+
+  beforeEach(function () {
+    sendStandardMessageStub = sinon
+      .stub(service, "sendStandardMessage")
+      .returns(Promise.resolve());
+  });
+
+  afterEach(function () {
+    sendStandardMessageStub.restore();
+  });
+
   it("should return 404 if message is not coming from a page", async () => {
     let event = {
       body: JSON.stringify({
@@ -60,5 +73,6 @@ describe("Tests for receiveWebhookHandler", function () {
     };
     const result = await app.receiveWebhookHandler(event, context);
     expect(result.statusCode).to.be.equal(200);
+    expect(sendStandardMessageStub.calledOnce).to.equal(true);
   });
 });
