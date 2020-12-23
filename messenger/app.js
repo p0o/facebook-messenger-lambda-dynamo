@@ -44,7 +44,7 @@ exports.receiveWebhookHandler = async (event, context, cb) => {
         if (webhookEvent.sender) {
           // Reply back to the sender to confirm if the message is received
           await sendStandardMessage(
-            "Thank you! I just received your inspiring message ✌🏼",
+            "Thank you! I just received your message ✌🏼",
             webhookEvent.sender.id
           );
         }
