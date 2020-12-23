@@ -26,7 +26,7 @@ const mockMessagePayload = {
 describe("Tests for receiveWebhookHandler", function () {
   it("should return 404 if message is not coming from a page", async () => {
     let event = {
-      body: {
+      body: JSON.stringify({
         object: "NOT page",
         entry: [
           {
@@ -37,7 +37,7 @@ describe("Tests for receiveWebhookHandler", function () {
             ],
           },
         ],
-      },
+      }),
     };
     const result = await app.receiveWebhookHandler(event, context);
     expect(result.statusCode).to.be.equal(404);
@@ -45,7 +45,7 @@ describe("Tests for receiveWebhookHandler", function () {
 
   it("should return 200 to all requests coming from the page", async () => {
     let event = {
-      body: {
+      body: JSON.stringify({
         object: "page",
         entry: [
           {
@@ -56,7 +56,7 @@ describe("Tests for receiveWebhookHandler", function () {
             ],
           },
         ],
-      },
+      }),
     };
     const result = await app.receiveWebhookHandler(event, context);
     expect(result.statusCode).to.be.equal(200);

@@ -16,25 +16,40 @@ const { MESSENGER_VERIFY_TOKEN } = process.env;
  */
 exports.receiveWebhookHandler = async (event, context, cb) => {
   let response;
-  const { body } = event;
+  const { body: bodyInJson } = event;
+
+  if (!bodyInJson || typeof bodyInJson !== "string") {
+    return;
+  }
+
+  let body;
+
+  try {
+    body = JSON.parse(bodyInJson);
+  } catch (e) {
+    console.error("body is not valid JSON", e);
+    return e;
+  }
 
   // Checks this is an event from a page subscription
   if (body && body.object === "page") {
     // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function (entry) {
-      // Gets the message. entry.messaging is an array, but
-      // will only ever contain one message, so we get index 0
-      const webhookEvent = entry.messaging[0];
-      console.log("[Lambda] Message received", webhookEvent);
+    await Promise.all(
+      body.entry.map(async function (entry) {
+        // Gets the message. entry.messaging is an array, but
+        // will only ever contain one message, so we get index 0
+        const webhookEvent = entry.messaging[0];
+        console.log("[Lambda] Message received", webhookEvent);
 
-      if (webhookEvent.sender) {
-        // Reply back to the sender to confirm if the message is received
-        sendStandardMessage(
-          "Thank you! I just received your inspiring message ✌🏼",
-          webhookEvent.sender
-        );
-      }
-    });
+        if (webhookEvent.sender) {
+          // Reply back to the sender to confirm if the message is received
+          await sendStandardMessage(
+            "Thank you! I just received your inspiring message ✌🏼",
+            webhookEvent.sender.id
+          );
+        }
+      })
+    );
 
     response = {
       statusCode: 200,
