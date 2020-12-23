@@ -75,4 +75,33 @@ describe("Tests for receiveWebhookHandler", function () {
     expect(result.statusCode).to.be.equal(200);
     expect(sendStandardMessageStub.calledOnce).to.equal(true);
   });
+
+  it("should call Send API with correct arguments", async () => {
+    let event = {
+      body: JSON.stringify({
+        object: "page",
+        entry: [
+          {
+            messaging: [
+              {
+                ...mockMessagePayload,
+              },
+            ],
+          },
+        ],
+      }),
+    };
+
+    const result = await app.receiveWebhookHandler(event, context);
+    const recipientId = mockMessagePayload.sender.id;
+
+    expect(result.statusCode).to.be.equal(200);
+    expect(sendStandardMessageStub.calledOnce).to.equal(true);
+    expect(
+      sendStandardMessageStub.calledWith(
+        "Thank you! I just received your message ✌🏼",
+        recipientId
+      )
+    );
+  });
 });
