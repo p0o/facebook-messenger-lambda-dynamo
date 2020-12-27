@@ -7,10 +7,11 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.0"
+    "axios": "^0.21.0",
+    "dynamoose": "^2.5.0"
   },
   "scripts": {
-    "test": "mocha tests/unit/"
+    "test": "MESSENGER_VERIFY_TOKEN=1 mocha tests/unit/"
   },
   "devDependencies": {
     "chai": "^4.2.0",

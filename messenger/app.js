@@ -1,6 +1,7 @@
-
 const service = require("./service");
+const model = require("./model");
 const { MESSENGER_VERIFY_TOKEN } = process.env;
+
 /**
  * Receive webhook from Facebook Messenger
  * 
@@ -47,6 +48,15 @@ exports.receiveWebhookHandler = async (event, context, cb) => {
             "Thank you! I just received your message ✌🏼",
             webhookEvent.sender.id
           );
+
+          // store the message in Dynamo DB
+          const newMesssage = new model.Message({
+            messageId: webhookEvent.message.mid,
+            senderId: webhookEvent.sender.id,
+            text: webhookEvent.message.text,
+          });
+
+          await newMesssage.save();
         }
       })
     );
@@ -61,7 +71,7 @@ exports.receiveWebhookHandler = async (event, context, cb) => {
     };
   }
 
-  return response
+  return response;
 };
 
 /**
