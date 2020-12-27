@@ -3,6 +3,7 @@ const sinon = require("sinon");
 const chai = require("chai");
 const app = require("../../app.js");
 const service = require("../../service");
+const model = require("../../model");
 const expect = chai.expect;
 let event, context;
 
@@ -25,16 +26,23 @@ const mockMessagePayload = {
 };
 
 describe("Tests for receiveWebhookHandler", function () {
+  this.timeout(5000);
   let sendStandardMessageStub;
+  let MessageStub;
 
   beforeEach(function () {
     sendStandardMessageStub = sinon
       .stub(service, "sendStandardMessage")
       .returns(Promise.resolve());
+
+    MessageStub = sinon
+      .stub(model, "Message")
+      .returns({ save: () => Promise.resolve() });
   });
 
   afterEach(function () {
     sendStandardMessageStub.restore();
+    MessageStub.restore();
   });
 
   it("should return 404 if message is not coming from a page", async () => {
@@ -74,6 +82,7 @@ describe("Tests for receiveWebhookHandler", function () {
     const result = await app.receiveWebhookHandler(event, context);
     expect(result.statusCode).to.be.equal(200);
     expect(sendStandardMessageStub.calledOnce).to.equal(true);
+    expect(MessageStub.calledOnce).to.equal(true);
   });
 
   it("should call Send API with correct arguments", async () => {
@@ -97,6 +106,7 @@ describe("Tests for receiveWebhookHandler", function () {
 
     expect(result.statusCode).to.be.equal(200);
     expect(sendStandardMessageStub.calledOnce).to.equal(true);
+    expect(MessageStub.calledOnce).to.equal(true);
     expect(
       sendStandardMessageStub.calledWith(
         "Thank you! I just received your message ✌🏼",
