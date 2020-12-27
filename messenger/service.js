@@ -18,7 +18,12 @@ exports.sendStandardMessage = async (
         message: {
           text,
         },
-      })
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   } catch (e) {
     console.error("Message is failed to be sent as a response", e);
